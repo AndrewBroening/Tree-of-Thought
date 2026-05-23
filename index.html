@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tree of Thought Workbench</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- MAIN CONTAINER -->
+<div class="app-container">
+
+  <!-- HEADER -->
+  <header class="app-header">
+    <div class="header-left">
+      <h1 class="app-title">🌳 Tree of Thought</h1>
+    </div>
+    <div class="header-center">
+      <span class="breadcrumb" id="breadcrumb">Ready to start</span>
+    </div>
+    <div class="header-right">
+      <button class="btn btn-secondary" id="btn-reset">Reset</button>
+    </div>
+  </header>
+
+  <!-- MAIN CONTENT -->
+  <div class="main-content">
+
+    <!-- LEFT PANEL: CANVAS -->
+    <div class="panel panel-left">
+      <div id="canvas" class="canvas-container"></div>
+    </div>
+
+    <!-- RIGHT PANEL: WORK AREA -->
+    <div class="panel panel-right">
+
+      <!-- MODE 1a: PROBLEM SETUP - Goal -->
+      <div class="mode" id="mode-setup-goal">
+        <div class="mode-header">
+          <h2>What's Your Goal?</h2>
+        </div>
+        <div class="mode-content">
+          <form id="form-setup-goal">
+            <div class="form-group">
+              <label for="input-goal">Goal / Problem to Solve:</label>
+              <input type="text" id="input-goal" placeholder="Target solution to reach" required>
+            </div>
+
+            <div class="form-actions">
+              <button type="submit" class="btn btn-primary" id="btn-setup-goal-next">Next →</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- MODE 1b: PROBLEM SETUP - Starting Thought -->
+      <div class="mode" id="mode-setup">
+        <div class="mode-header">
+          <h2>What's Your Starting Thought?</h2>
+          <div class="goal-banner-preview" id="goal-preview"></div>
+        </div>
+        <div class="mode-content">
+          <form id="form-setup">
+            <div class="form-group">
+              <label for="input-start-thought">Starting Thought / Question:</label>
+              <input type="text" id="input-start-thought" placeholder="Starting Thought / Question" required>
+            </div>
+
+            <div class="form-actions">
+              <button type="submit" class="btn btn-primary" id="btn-setup-create">Create New Tree</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- MODE 2: ADDING THOUGHTS -->
+      <div class="mode" id="mode-adding">
+        <div class="mode-header">
+          <h3>Exploring Thoughts</h3>
+          <p class="current-thought" id="current-thought">Current: Thinking...</p>
+          <p class="path-info" id="path-info">Path: start</p>
+        </div>
+
+        <div class="mode-content">
+          <!-- Thoughts Added -->
+          <div class="thoughts-section">
+            <h4>Thoughts Added <span class="counter" id="counter-thoughts">0</span></h4>
+            <div class="thoughts-table" id="thoughts-list-added">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+
+          <!-- Probability Slider -->
+          <div class="probability-slider-section" id="probability-slider-container" style="display: none;">
+            <h4>Probability Adjustment</h4>
+            <div class="slider-visualization" id="probability-slider-knobs">
+              <!-- Dynamically populated with knobs -->
+            </div>
+            <div class="probability-display" id="probability-display">
+              <!-- Dynamically populated with percentages -->
+            </div>
+          </div>
+
+          <!-- Add New Thought Form -->
+          <div class="add-form-section">
+            <form id="form-add-thought">
+              <div class="form-group">
+                <label for="input-thought">Add Thought</label>
+                <input type="text" id="input-thought" placeholder="Add Thought" required>
+              </div>
+
+              <div class="form-actions">
+                <button type="submit" class="btn btn-primary">+ Add Thought</button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Explore button -->
+          <div class="explore-actions mode-footer">
+            <button class="btn btn-success" id="btn-adding-explore" style="width: 100%; justify-content: center;">Explore Best →</button>
+            <button class="btn btn-block" id="btn-adding-mark-dead-end" style="background-color: #dc3545; border-color: #dc3545; color: #fff; display: none; margin-top: 10px;">
+              ✗ Mark as Dead-End
+            </button>
+            <button class="btn btn-primary" id="btn-adding-mark-goal" style="display: none; margin-top: 10px; width: 100%; justify-content: center;">
+              ✓ This is the Goal
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- MODE 3: EXPLORING -->
+      <div class="mode" id="mode-exploring">
+        <div class="mode-header">
+          <h3>Ready to Explore</h3>
+          <p class="state-info">State: <span id="state-label-explore">(0,0)</span></p>
+          <p class="path-info" id="path-info-explore">Path: start</p>
+        </div>
+
+        <div class="mode-content">
+          <!-- Best Thought -->
+          <div class="best-thought-section">
+            <h4>🏆 Best Thought</h4>
+            <div class="best-thought-box">
+              <span class="thought-text" id="best-thought">Thinking...</span>
+            </div>
+          </div>
+
+          <!-- Other Thoughts -->
+          <div class="other-thoughts-section">
+            <h4>Other Options:</h4>
+            <ul class="other-thoughts-list" id="other-thoughts-list">
+              <!-- Dynamically populated -->
+            </ul>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="explore-actions">
+            <button class="btn btn-primary" id="btn-explore-best" style="width: 100%; justify-content: center; background: #28a745; border-color: #1e7e34;">Explore This →</button>
+          </div>
+
+          <div class="mode-footer">
+            <p class="hint">💡 System picks the highest-scoring option. Change it if you want.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- MODE 4: EVALUATE THOUGHT -->
+      <div class="mode" id="mode-marking">
+        <div class="mode-header">
+          <h3>Evaluate This Thought</h3>
+          <p class="current-thought" id="current-thought-mark">Thinking: ...</p>
+          <p class="path-info" id="path-info-mark">Path: start</p>
+        </div>
+
+        <div class="mode-content">
+          <div class="marking-options">
+            <p>Choose what to do with this thought:</p>
+
+            <button class="btn btn-block" id="btn-mark-dead-end" style="background-color: #dc3545; border-color: #dc3545; color: #fff;">
+              ✗ Mark as Dead-End
+            </button>
+
+            <button class="btn btn-block" id="btn-mark-create-branch" style="background-color: #28a745; border-color: #1e7e34; color: #fff;">
+              ⊕ Create New Branch
+            </button>
+
+            <button class="btn btn-primary btn-block" id="btn-mark-goal">
+              ✓ This is the Goal
+            </button>
+          </div>
+
+          <div class="mode-footer">
+            <p class="hint">💡 Mark as failed, create a new branch, or mark as solution.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- MODE 5: LAYER EXHAUSTED -->
+      <div class="mode" id="mode-exhausted">
+        <div class="mode-header">
+          <h3>No More Candidates</h3>
+          <p class="current-thought" id="current-thought-exhausted">Layer: Thinking...</p>
+          <p class="path-info" id="path-info-exhausted">Path: start</p>
+        </div>
+
+        <div class="mode-content">
+          <div class="exhausted-options">
+            <p>All candidates in this layer have been tested.</p>
+
+            <button class="btn btn-block" id="btn-exhausted-add-more" style="background-color: #28a745; border-color: #1e7e34; color: #fff;">
+              + Add More Candidates
+            </button>
+
+            <button class="btn btn-block" id="btn-exhausted-mark-dead" style="background-color: #f8d7da; border-color: #dc3545; color: #721c24;">
+              ✗ Mark Layer as Dead-End
+            </button>
+          </div>
+
+          <div class="mode-footer">
+            <p class="hint">💡 Add more candidates to explore, or mark this layer as exhausted.</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<!-- SOLUTION MODAL -->
+<div class="modal" id="modal-solution">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>🎉 Solution Found!</h2>
+      <button class="modal-close" id="btn-modal-close">&times;</button>
+    </div>
+    <div class="modal-body">
+      <h3>Steps from start to goal:</h3>
+      <ol class="solution-path" id="solution-path">
+        <!-- Dynamically populated -->
+      </ol>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" id="btn-modal-copy">Copy Path</button>
+      <button class="btn btn-primary" id="btn-modal-explore">Continue Exploring</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL BACKDROP -->
+<div class="modal-backdrop" id="modal-backdrop"></div>
+
+<!-- JAVASCRIPT MODULES -->
+<script src="js/state.js"></script>
+<script src="js/layout.js"></script>
+<script src="js/render.js"></script>
+<script src="js/events.js"></script>
+<script src="js/app.js"></script>
+<script>
+  // Initialize the app after all scripts are loaded
+  initApp();
+</script>
+
+</body>
+</html>
