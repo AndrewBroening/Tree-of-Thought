@@ -83,6 +83,15 @@ function setupAddingEvents() {
     thought.focus();
   });
   
+  // Handle Shift+Enter to explore best
+  const thoughtInput = document.getElementById('input-thought');
+  thoughtInput?.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && e.shiftKey) {
+      e.preventDefault();
+      exploreThought();
+    }
+  });
+  
   setupClickHandler('btn-adding-explore', () => {
     exploreThought();
   });
